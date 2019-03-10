@@ -3,8 +3,8 @@ module Main exposing (Model, Msg(..), init, main, subscriptions, update, view)
 import Browser
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, p, text)
-import Html.Attributes exposing (style)
+import Html exposing (Html, button, img, text)
+import Html.Attributes exposing (src, style)
 import Html.Events exposing (onClick)
 import Task
 
@@ -28,7 +28,7 @@ main =
 
 
 type alias Model =
-    { csv : Maybe String
+    { image : Maybe String
     }
 
 
@@ -42,28 +42,39 @@ init _ =
 
 
 type Msg
-    = CsvRequested
-    | CsvSelected File
-    | CsvLoaded String
+    = ImageRequested
+    | ImageSelected File
+    | ImageLoaded (Result LoadErr String)
+
+
+type LoadErr
+    = ErrToUrlFailed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CsvRequested ->
+        ImageRequested ->
             ( model
-            , Select.file [ "text/csv" ] CsvSelected
+            , Select.file [ "image/png", "image/jpg", "image/gif" ] ImageSelected
             )
 
-        CsvSelected file ->
+        ImageSelected file ->
             ( model
-            , Task.perform CsvLoaded (File.toString file)
+            , Task.attempt ImageLoaded <| File.toUrl file
             )
 
-        CsvLoaded content ->
-            ( { model | csv = Just content }
-            , Cmd.none
-            )
+        ImageLoaded result ->
+            case result of
+                Ok content ->
+                    ( { model | image = Just content }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model | image = Nothing }
+                    , Cmd.none
+                    )
 
 
 
@@ -72,12 +83,14 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    case model.csv of
+    case model.image of
         Nothing ->
-            button [ onClick CsvRequested ] [ text "Load CSV" ]
+            button [ onClick ImageRequested ] [ text "Upload image" ]
 
         Just content ->
-            p [ style "white-space" "pre" ] [ text content ]
+            img
+                [ src content ]
+                []
 
 
 
