@@ -3,7 +3,7 @@ module Main exposing (Model, Msg(..), init, main, subscriptions, update, view)
 import Browser
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, img, text)
+import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (src, style)
 import Html.Events exposing (onClick)
 import Task
@@ -29,12 +29,13 @@ main =
 
 type alias Model =
     { image : Maybe String
+    , error : Maybe LoadErr
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model Nothing, Cmd.none )
+    ( Model Nothing Nothing, Cmd.none )
 
 
 
@@ -49,6 +50,7 @@ type Msg
 
 type LoadErr
     = ErrToUrlFailed
+    | ErrInvalidFile
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,25 +58,48 @@ update msg model =
     case msg of
         ImageRequested ->
             ( model
-            , Select.file [ "image/png", "image/jpg", "image/gif" ] ImageSelected
+            , Select.file expectedTypes ImageSelected
             )
 
         ImageSelected file ->
             ( model
-            , Task.attempt ImageLoaded <| File.toUrl file
+            , Task.attempt ImageLoaded
+                (guardType file
+                    |> Task.andThen File.toUrl
+                )
             )
 
         ImageLoaded result ->
             case result of
                 Ok content ->
-                    ( { model | image = Just content }
+                    ( { model
+                        | image = Just content
+                        , error = Nothing
+                      }
                     , Cmd.none
                     )
 
-                Err _ ->
-                    ( { model | image = Nothing }
+                Err error ->
+                    ( { model
+                        | image = Nothing
+                        , error = Just error
+                      }
                     , Cmd.none
                     )
+
+
+expectedTypes : List String
+expectedTypes =
+    [ "image/png", "image/jpg", "image/gif" ]
+
+
+guardType : File -> Task.Task LoadErr File
+guardType file =
+    if List.any ((==) <| File.mime file) expectedTypes then
+        Task.succeed file
+
+    else
+        Task.fail ErrInvalidFile
 
 
 
@@ -83,14 +108,30 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    case model.image of
-        Nothing ->
-            button [ onClick ImageRequested ] [ text "Upload image" ]
+    div []
+        [ button [ onClick ImageRequested ] [ text "Upload image" ]
+        , div
+            [ style "color" "red" ]
+            [ text <|
+                case model.error of
+                    Nothing ->
+                        ""
 
-        Just content ->
-            img
-                [ src content ]
-                []
+                    Just ErrInvalidFile ->
+                        "Invalid file"
+
+                    Just ErrToUrlFailed ->
+                        "Failed to convert file to URL"
+            ]
+        , case model.image of
+            Nothing ->
+                img [] []
+
+            Just content ->
+                img
+                    [ src content ]
+                    []
+        ]
 
 
 
