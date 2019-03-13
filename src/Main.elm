@@ -112,7 +112,7 @@ update msg model =
 
 expectedTypes : List String
 expectedTypes =
-    [ "image/png", "image/jpg", "image/gif" ]
+    [ "image/png", "image/jpeg", "image/gif" ]
 
 
 guardType : File -> Task.Task LoadErr File
@@ -133,9 +133,12 @@ view model =
     div
         [ Layout.fullHeight
         , Layout.fullWidth
-        , Events.preventDefaultOn "dragover" <| Decode.succeed ( ChangeStatus Dragover, True )
-        , Events.preventDefaultOn "drop" <| Decode.succeed ( ChangeStatus Default, True )
-        , Events.on "dragleave" <| Decode.succeed (ChangeStatus Default)
+        , Events.preventDefaultOn "dragover" <|
+            Decode.succeed ( ChangeStatus Dragover, True )
+        , Events.preventDefaultOn "drop" <|
+            Decode.succeed ( ChangeStatus Default, True )
+        , Events.on "dragleave" <|
+            Decode.succeed (ChangeStatus Default)
         ]
         [ div
             [ Layout.wrap
