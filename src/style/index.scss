@@ -17,10 +17,12 @@
 }
 
 .imgBox {
+  background-color: #fff;
   border: solid 1px #ccc;
   width: fit-content;
   height: auto;
   max-width: 100%;
+  z-index: 1;
 }
 
 .dropArea {
@@ -36,12 +38,8 @@
   width: 90%;
 }
 
-div[aria-dragged="true"] {
-  background-color: #eee;
-}
-
-div[aria-dragged="true"] img {
-  opacity: 0.5;
+div[aria-dragged="true"] * {
+  opacity: 0.8;
 }
 
 .draggedArea {
@@ -50,4 +48,15 @@ div[aria-dragged="true"] img {
   align-items: center;
   justify-content: center;
   top: 0;
+}
+
+.draggable {
+  font-size: 2em;
+  color: #aaa;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  pointer-events: none;
 }

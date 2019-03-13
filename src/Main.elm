@@ -186,7 +186,12 @@ view model =
                 ]
 
           else
-            div [] []
+            div
+                [ Layout.fullHeight
+                , Layout.fullWidth
+                , Atom.class "draggable"
+                ]
+                [ text "Drag&Drop here" ]
         ]
 
 
