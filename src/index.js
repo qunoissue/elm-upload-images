@@ -1,3 +1,7 @@
+require('./style/reset.scss');
+require('./style/layout.scss');
+require('./style/index.scss');
+
 const { Elm } = require('./Main.elm');
 const hljs = require("highlight.js/lib/highlight.js");
 hljs.registerLanguage('elm', require('highlight.js/lib/languages/elm.js'));

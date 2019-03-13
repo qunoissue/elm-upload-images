@@ -1,0 +1,53 @@
+@import 'variables';
+
+.title {
+  font-size: 1.6em;
+}
+
+.button {
+  padding: $half-padding;
+  cursor: pointer;
+  border: solid 2px;
+  border-radius: 0.2em;
+  height: 2em;
+}
+
+.error {
+  color: #f00;
+}
+
+.imgBox {
+  border: solid 1px #ccc;
+  width: fit-content;
+  height: auto;
+  max-width: 100%;
+}
+
+.dropArea {
+  font-size: 2em;
+  color: #666;
+  background-color: #fff;
+  border: solid 5px #f93;
+  border-radius: $default-radius;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  width: 90%;
+}
+
+div[aria-dragged="true"] {
+  background-color: #eee;
+}
+
+div[aria-dragged="true"] img {
+  opacity: 0.5;
+}
+
+.draggedArea {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+}
